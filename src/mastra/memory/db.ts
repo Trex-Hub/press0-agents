@@ -2,11 +2,12 @@
 import { PostgresStore, PgVector } from "@mastra/pg";
 // CONSTANTS
 import { DATABASE_URL } from "@/utils/constants";
+// TYPES
 
-let sharedStore: PostgresStore | null = null;
-let sharedVector: PgVector | null = null;
+let sharedStore: PostgresStore;
+let sharedVector: PgVector;
 
-const getSharedStore = () => {
+const getSharedStore = (): PostgresStore => {
   if (!sharedStore) {
     sharedStore = new PostgresStore({
       connectionString: DATABASE_URL,
@@ -16,7 +17,7 @@ const getSharedStore = () => {
   return sharedStore;
 };
 
-const getSharedVector = () => {
+const getSharedVector = (): PgVector => {
   if (!sharedVector) {
     sharedVector = new PgVector({
       connectionString: DATABASE_URL,

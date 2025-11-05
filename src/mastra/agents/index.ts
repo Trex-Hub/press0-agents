@@ -1,5 +1,4 @@
 // CORE
-import { openai } from "@ai-sdk/openai";
 import { anthropic } from "@ai-sdk/anthropic";
 import { Agent } from "@mastra/core/agent";
 // TOOLS
