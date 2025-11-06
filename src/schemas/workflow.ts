@@ -3,7 +3,8 @@ import { z } from "zod";
 
 
 export const ChatStepInputSchema = z.object({
-  prompt: z.string().describe("The user's prompt or message"),
+  message: z.string().describe("The user's inbound message from WhatsApp"),
+  resourceId: z.string().describe("The user's WhatsApp mobile number"),
 });
 
 export const ChatStepOutputSchema = z.object({
@@ -11,7 +12,7 @@ export const ChatStepOutputSchema = z.object({
 });
 
 export const ChatWorkflowInputSchema = z.object({
-  prompt: z.string().describe("The user's prompt or message"),
+  message: z.string().describe("The user's inbound message from WhatsApp"),
 });
 
 export const ChatWorkflowOutputSchema = z.object({

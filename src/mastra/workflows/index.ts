@@ -6,47 +6,38 @@ import {
   ChatWorkflowInputSchema,
   ChatWorkflowOutputSchema,
 } from "@/schemas/workflow";
+// CONSTANTS
+import { PRESS_0_WORKFLOW_ID } from "@/utils/constants";
+// SERVICES
+import { metaService } from "@/services/meta.service";
+// CONSTANTS
+import { MESSAGE_STEP_ID , PRESS_0_AGENT_ID } from "@/utils/constants";
 
 const chatStep = createStep({
-  id: "chat-step",
+  id: MESSAGE_STEP_ID,
   inputSchema: ChatStepInputSchema,
   outputSchema: ChatStepOutputSchema,
-  execute: async ({ inputData, mastra, writer }) => {
-    const { prompt } = inputData;
+  execute: async ({ inputData, mastra }) => {
+    const { message, resourceId } = inputData;
 
-    const agent = mastra?.getAgent("press0Agent");
+    const agent = mastra?.getAgent(PRESS_0_AGENT_ID);
     if (!agent) {
       throw new Error("Agent not found");
     }
 
-    const stream = await agent.stream(prompt);
+    const result = await agent.generate(message);
+    const text = result?.text ?? "";
 
-    // Stream agent's output to workflow writer for real-time streaming
-    if (writer) {
-      // Forward chunks from agent's fullStream to workflow writer
-      const reader = stream.fullStream.getReader();
-      
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          if (value) {
-            await writer.write(value);
-          }
-        }
-      } finally {
-        reader.releaseLock();
-      }
+    if (resourceId && text) {
+      await metaService.sendMessage({ phoneNumber: resourceId, message: text });
     }
 
-    return {
-      text: await stream.text,
-    };
+    return { text };
   },
 });
 
 export const chatWorkflow = createWorkflow({
-  id: "chat-workflow",
+  id: PRESS_0_WORKFLOW_ID,
   inputSchema: ChatWorkflowInputSchema,
   outputSchema: ChatWorkflowOutputSchema,
 })
