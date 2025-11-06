@@ -1,4 +1,5 @@
-import { press0Agent } from "@/mastra/agents";
+import { mastra } from "@/mastra/index";
+
 export const handleChat = async (c: any) => {
   const { prompt = "" } = (await c.req.json()) ?? {};
 
@@ -8,19 +9,30 @@ export const handleChat = async (c: any) => {
   c.header("Connection", "keep-alive");
   c.header("Access-Control-Allow-Origin", "*");
 
-  const stream = await press0Agent.streamVNext([
-    { role: "user", content: prompt },
-  ]);
+  const workflow = mastra.getWorkflow("chatWorkflow");
+  const run = await workflow.createRunAsync();
+
+  const stream = await run.streamVNext({
+    inputData: { prompt },
+  });
 
   const sseStream = new ReadableStream({
     async start(controller) {
       try {
-        const reader = stream.textStream.getReader();
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          const data = `data: ${value}\n\n`;
-          controller.enqueue(new TextEncoder().encode(data));
+        for await (const chunk of stream) {
+          // Handle text chunks from agent (piped through writer)
+          // Agent chunks come through as workflow-step-output with nested chunks
+          if (chunk.type === "workflow-step-output") {
+            const payload = chunk.payload as { output?: any };
+            if (payload?.output) {
+              const output = payload.output;
+              // Handle nested text-delta chunks
+              if (output.type === "text-delta" && output.payload?.text) {
+                const data = `data: ${output.payload.text}\n\n`;
+                controller.enqueue(new TextEncoder().encode(data));
+              }
+            }
+          }
         }
         controller.close();
       } catch (error) {
