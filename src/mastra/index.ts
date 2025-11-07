@@ -8,7 +8,7 @@ import { press0Agent } from '@/mastra/agents';
 // WORKFLOWS
 import { chatWorkflow } from '@/mastra/workflows';
 // SERVICES
-import { handleWebhookPost } from '@/services/message.handler';
+import { handleWebhookPost, handleWebhookGet } from '@/services/message.handler';
 // CONSTANTS
 import { LOGGER_LEVEL } from '@/utils/constants';
 // TYPES
@@ -27,10 +27,14 @@ export const mastra = new Mastra({
   }), 
   server:{
     apiRoutes: [
-      registerApiRoute("/webhook/whatsapp",{
+      registerApiRoute("/webhook",{
+        method: "GET",
+        handler: handleWebhookGet,
+      }),
+      registerApiRoute("/webhook",{
         method: "POST",
         handler: handleWebhookPost,
-      })
+      }),
     ]
   },
   storage,

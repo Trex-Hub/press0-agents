@@ -7,6 +7,17 @@ import { PRESS_0_WORKFLOW_ID } from "@/utils/constants";
 // LOGGER
 import logger from "@/utils/logger";
 
+
+export const handleWebhookGet = async (c: any) => {
+  const mode = c.req.query("hub.mode");
+  const token = c.req.query("hub.verify_token");
+  const challenge = c.req.query("hub.challenge");
+  if (await metaService.verifyWebhook({ mode, token })){
+    return c.text(challenge, 200);
+  };
+  return c.text("Forbidden", 403);
+};
+
 export const handleWebhookPost = async (c: any) => {
   const body = await c.req.json();
   const value = getMessagesValue(body);
