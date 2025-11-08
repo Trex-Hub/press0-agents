@@ -1,5 +1,5 @@
 // LOGGER
-import logger from "@/utils/logger";
+import logger from '@/utils/logger';
 
 interface FetchState<T> {
   data: T | null;
@@ -7,10 +7,15 @@ interface FetchState<T> {
   isError: boolean;
   isSuccess: boolean;
   error: Error | null;
+  statusCode: number;
+}
+
+interface ApiOptions extends RequestInit {
+  responseType?: 'json' | 'blob' | 'text';
 }
 
 export class ApiService {
-  private baseUrl: string = "";
+  private baseUrl: string = '';
 
   constructor(baseUrl?: string) {
     if (baseUrl) {
@@ -22,16 +27,14 @@ export class ApiService {
     this.baseUrl = url;
   }
 
-  async fetchData<T>(
-    endpoint: string,
-    options?: RequestInit
-  ): Promise<FetchState<T>> {
+  async fetchData<T>(endpoint: string, options?: ApiOptions): Promise<FetchState<T>> {
     const state: FetchState<T> = {
       data: null,
       isLoading: true,
       isError: false,
       isSuccess: false,
       error: null,
+      statusCode: 0,
     };
 
     try {
@@ -42,68 +45,100 @@ export class ApiService {
         },
       });
 
+      const statusCode = response.status;
+
+      let data: unknown = null;
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        try {
+          switch (options?.responseType) {
+            case 'blob':
+              data = await response.blob();
+              break;
+            case 'text':
+              data = await response.text();
+              break;
+            default:
+              data = await response.json();
+          }
+        } catch {
+          data = null;
+        }
+
+        const error = Object.assign(new Error(`HTTP error! status: ${statusCode}`), {
+          statusCode,
+          responseData: data,
+        });
+
+        throw error;
       }
+
       logger.info(`API call to ${endpoint} successful`);
-      
-      const data = await response.json();
+
+      switch (options?.responseType) {
+        case 'blob':
+          data = await response.blob();
+          break;
+        case 'text':
+          data = await response.text();
+          break;
+        default:
+          data = await response.json();
+      }
+
+      logger.info(`API call to ${endpoint} successful`, { data });
 
       return {
         ...state,
-        data,
+        data: data as T,
         isLoading: false,
         isSuccess: true,
+        statusCode,
       };
-    } catch (error) {
-      // If AbortError, keep the original error
+    } catch (error: unknown) {
       logger.error(`API call to ${endpoint} failed`);
-      logger.error(`[ERROR LOG] ${error instanceof Error ? error.message : 'Unknown error'}`);
-      if (error instanceof Error && error.name === "AbortError") {
-        throw error;
-      }
+      logger.error('[ERROR LOG]', { error });
 
       return {
         ...state,
         isLoading: false,
         isError: true,
-        error: error instanceof Error ? error : new Error("An error occurred"),
+        error: error instanceof Error ? error : new Error('An error occurred'),
+        data: error instanceof Error ? (error as unknown as { responseData: unknown }).responseData as T : null,
+        statusCode: error instanceof Error ? (error as unknown as { statusCode: number }).statusCode : 500,
       };
     }
   }
 
-  // Convenience methods for different HTTP methods
-  async get<T>(endpoint: string, options?: RequestInit) {
+  async get<T>(endpoint: string, options?: ApiOptions) {
     logger.info(`API call to ${endpoint} successful`);
-    return this.fetchData<T>(endpoint, { ...options, method: "GET" });
+    return this.fetchData<T>(endpoint, { ...options, method: 'GET' });
   }
 
-  async post<T>(endpoint: string, body: any, options?: RequestInit) {
-    // Determine if body should be sent as JSON or form data.
-    const isFormBody =
-      body instanceof FormData || body instanceof URLSearchParams;
+  async post<T>(endpoint: string, body: unknown, options?: ApiOptions) {
+    const isFormBody = body instanceof FormData || body instanceof URLSearchParams;
     const headers = isFormBody
       ? { ...options?.headers }
-      : { "Content-Type": "application/json", ...options?.headers };
+      : { 'Content-Type': 'application/json', ...options?.headers };
 
     return this.fetchData<T>(endpoint, {
       ...options,
-      method: "POST",
+      method: 'POST',
       body: isFormBody ? body : JSON.stringify(body),
       headers,
     });
   }
 
-  async put<T>(endpoint: string, body: any, options?: RequestInit) {
+  async put<T>(endpoint: string, body: unknown, options?: ApiOptions) {
     return this.fetchData<T>(endpoint, {
       ...options,
-      method: "PUT",
+      method: 'PUT',
       body: JSON.stringify(body),
     });
   }
 
-  async delete<T>(endpoint: string, options?: RequestInit) {
-    return this.fetchData<T>(endpoint, { ...options, method: "DELETE" });
+  async delete<T>(endpoint: string, options?: ApiOptions) {
+    return this.fetchData<T>(endpoint, { ...options, method: 'DELETE' });
   }
 }
 

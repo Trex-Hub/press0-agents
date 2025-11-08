@@ -29,3 +29,14 @@ export const PERPLEXICA_CONFIG = {
 
 // DATABASE
 export const DATABASE_URL = process.env.DATABASE_URL!; 
+
+// META
+export const META_BASE_URL = process.env.META_BASE_URL!;
+export const META_ACCESS_TOKEN = process.env.META_ACCESS_TOKEN!;
+export const META_BUSINESS_PHONE_ID = process.env.META_BUSINESS_PHONE_ID!;
+export const META_VERIFY_TOKEN = process.env.META_VERIFY_TOKEN!;
+
+// IDS
+export const PRESS_0_WORKFLOW_ID = 'press0-workflow';
+export const MESSAGE_STEP_ID = 'message-step';
+export const PRESS_0_AGENT_ID = 'press0-agent';

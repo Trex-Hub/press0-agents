@@ -5,8 +5,10 @@ import { registerApiRoute } from "@mastra/core/server";
 import { PinoLogger } from '@mastra/loggers';
 // AGENTS
 import { press0Agent } from '@/mastra/agents';
+// WORKFLOWS
+import { chatWorkflow } from '@/mastra/workflows';
 // SERVICES
-import { handleChat } from '@/services/chat.service';
+import { handleWebhookPost, handleWebhookGet } from '@/services/message.handler';
 // CONSTANTS
 import { LOGGER_LEVEL } from '@/utils/constants';
 // TYPES
@@ -18,16 +20,21 @@ const storage = getSharedStore();
 
 export const mastra = new Mastra({
   agents: { press0Agent },
+  workflows: { chatWorkflow },
   logger: new PinoLogger({
     name: 'Mastra',
     level: LOGGER_LEVEL as LogLevel,
   }), 
   server:{
     apiRoutes: [
-      registerApiRoute("/chat/stream",{
+      registerApiRoute("/webhook",{
+        method: "GET",
+        handler: handleWebhookGet,
+      }),
+      registerApiRoute("/webhook",{
         method: "POST",
-        handler: handleChat,
-      })
+        handler: handleWebhookPost,
+      }),
     ]
   },
   storage,
