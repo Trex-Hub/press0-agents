@@ -10,6 +10,7 @@ import { PRESS_0_AGENT_ID } from "@/utils/constants";
 
 export const press0Agent = new Agent({
   name: PRESS_0_AGENT_ID,
+  id: PRESS_0_AGENT_ID,
   instructions: `You are a friendly and helpful Agent.`,
   description: "You are a friendly and helpful Agent.",
   model: anthropic("claude-3-5-sonnet-20240620"),

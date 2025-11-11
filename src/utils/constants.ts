@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 // LOGGER RELATED
-export const LOGGER_LEVEL = process.env.LOGGER_LEVEL || "info";
+export const LOGGER_LEVEL = process.env.LOGGER_LEVEL || "debug";
 
 // GOOGLE
 export const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY!;
@@ -21,3 +21,7 @@ export const META_VERIFY_TOKEN = process.env.META_VERIFY_TOKEN!;
 export const PRESS_0_WORKFLOW_ID = 'press0-workflow';
 export const MESSAGE_STEP_ID = 'message-step';
 export const PRESS_0_AGENT_ID = 'press0-agent';
+
+// STATUS
+export const STATUS_SUCCESS = 'success';
+export const STATUS_FAILED = 'failed';

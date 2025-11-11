@@ -3,7 +3,11 @@ import { metaService } from "@/services/meta.service";
 // UTILS
 import { getMessagesValue } from "@/utils/index";
 // CONSTANTS  
-import { PRESS_0_WORKFLOW_ID } from "@/utils/constants";
+import { 
+  PRESS_0_WORKFLOW_ID,
+  STATUS_SUCCESS,
+  STATUS_FAILED,
+} from "@/utils/constants";
 // LOGGER
 import logger from "@/utils/logger";
 
@@ -39,19 +43,23 @@ export const handleWebhookPost = async (c: any) => {
     (async () => {
       try {
         const mastra = c.get("mastra");
-        const run = mastra.getWorkflow(PRESS_0_WORKFLOW_ID).createRun();
-        const result = await run.start({
+        const run = await mastra.getWorkflow(PRESS_0_WORKFLOW_ID).createRunAsync();
+        const { output, status } = await run.start({
           inputData: {
             message: text,
             resourceId: from,
           },
-        });
-        await metaService.sendMessage({ phoneNumber: from, message: result.output.response });
+        }) ?? {};
+        if (status === STATUS_FAILED) {
+          await metaService.sendMessage({ phoneNumber: from, message: "Hi There, Apologies from Press0, something went wrong. We are working on fixing the issue. Please try again later." });
+        } else if (status === STATUS_SUCCESS) {
+          await metaService.sendMessage({ phoneNumber: from, message: output?.text });
+        };
       } catch (error) {
         logger.error("Error while running the workflow", { error });
         await metaService.sendMessage({ phoneNumber: from, message: "Hi There, Apologies from Press0, something went wrong. We are working on fixing the issue. Please try again later." });
       }
-    })();
+    })(); 
 
     // **this is crucial**—we return the ack, not `undefined`
     return ack;
