@@ -44,7 +44,7 @@ export const handleWebhookPost = async (c: any) => {
       try {
         const mastra = c.get("mastra");
         const run = await mastra.getWorkflow(PRESS_0_WORKFLOW_ID).createRunAsync();
-        const { output, status } = await run.start({
+        const { result, status } = await run.start({
           inputData: {
             message: text,
             resourceId: from,
@@ -53,7 +53,7 @@ export const handleWebhookPost = async (c: any) => {
         if (status === STATUS_FAILED) {
           await metaService.sendMessage({ phoneNumber: from, message: "Hi There, Apologies from Press0, something went wrong. We are working on fixing the issue. Please try again later." });
         } else if (status === STATUS_SUCCESS) {
-          await metaService.sendMessage({ phoneNumber: from, message: output?.text });
+          await metaService.sendMessage({ phoneNumber: from, message: result?.text ?? "" });
         };
       } catch (error) {
         logger.error("Error while running the workflow", { error });
