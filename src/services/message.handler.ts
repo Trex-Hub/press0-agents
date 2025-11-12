@@ -33,12 +33,39 @@ export const handleWebhookPost = async (c: any) => {
   // 2️⃣ Inbound messages → ack _first_, then process
   if (Array.isArray(value?.messages) && value.messages.length > 0) {
     const msg = value.messages[0];
-    const text = msg.text?.body ?? "";
     const from = msg.from;
-    logger.info("💬 Inbound Message Content:", text);
-
+    
     // **return** the ack right away
     const ack = c.text("EVENT_RECEIVED", 200);
+
+    // Handle video messages
+    if (msg.type === "video" && msg.video?.id) {
+      logger.info("🎥 Video message received", { 
+        videoId: msg.video.id, 
+        mimeType: msg.video.mime_type,
+        caption: msg.video.caption 
+      });
+
+      (async () => {
+        try {
+          const videoPath = await metaService.downloadVideo(msg.video.id);
+          logger.info(`📁 Video saved to: ${videoPath}`);
+          // TODO: Add video analysis pipeline here
+        } catch (error) {
+          logger.error("Error downloading video", { error });
+          await metaService.sendMessage({ 
+            phoneNumber: from, 
+            message: "Hi There, Apologies from Press0, we couldn't process your video. Please try again later." 
+          });
+        }
+      })();
+
+      return ack;
+    }
+
+    // Handle text messages
+    const text = msg.text?.body ?? "";
+    logger.info("💬 Inbound Message Content:", text);
 
     (async () => {
       try {
