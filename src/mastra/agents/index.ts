@@ -1,5 +1,5 @@
 // CORE
-import { anthropic } from "@ai-sdk/anthropic";
+import { openai } from "@ai-sdk/openai";
 import { Agent } from "@mastra/core/agent";
 // TOOLS
 import { analyzeVideo } from "@/mastra/tools/video";
@@ -13,7 +13,7 @@ export const press0Agent = new Agent({
   id: PRESS_0_AGENT_ID,
   instructions: `You are a friendly and helpful Agent.`,
   description: "You are a friendly and helpful Agent.",
-  model: anthropic("claude-3-5-sonnet-20240620"),
+  model: openai("gpt-4o-mini"),
   tools: {
     analyzeVideo,
   },
