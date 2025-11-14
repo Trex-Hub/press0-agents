@@ -3,8 +3,8 @@ import { z } from "zod";
 
 // Video Analysis Input Schema
 export const VideoAnalysisInputSchema = z.object({
-  prompt: z.string().describe("Prompt"),
-  videoUrl: z.string().describe("Video URL"),
+  prompt: z.string().describe("The prompt/question to analyze the video with"),
+  videoUrl: z.string().optional().describe("Video URL (only use if explicitly provided, otherwise mediaId from runtime context will be used)"),
 });
 
 // Video Analysis Output Schema

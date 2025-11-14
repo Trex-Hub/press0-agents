@@ -15,7 +15,7 @@ const chatStep = createStep({
   id: MESSAGE_STEP_ID,
   inputSchema: ChatStepInputSchema,
   outputSchema: ChatStepOutputSchema,
-  execute: async ({ inputData, mastra }) => {
+  execute: async ({ inputData, mastra, runtimeContext }) => {
     const { message, resourceId } = inputData;
 
     const agent = mastra?.getAgent(PRESS_0_AGENT_ID);
@@ -23,7 +23,7 @@ const chatStep = createStep({
       throw new Error("Agent not found");
     };
 
-    const { text = ''} = await agent.generate(message) ?? {};
+    const { text = ''} = await agent.generate(message, { runtimeContext }) ?? {};
     return { text };
   },
 });
