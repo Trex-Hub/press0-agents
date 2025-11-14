@@ -10,6 +10,8 @@ import {
 } from "@/utils/constants";
 // LOGGER
 import logger from "@/utils/logger";
+// MASTRA
+import { RuntimeContext } from "@mastra/core/runtime-context";
 
 
 export const handleWebhookGet = async (c: any) => {
@@ -38,44 +40,39 @@ export const handleWebhookPost = async (c: any) => {
     // **return** the ack right away
     const ack = c.text("EVENT_RECEIVED", 200);
 
-    // Handle video messages
-    if (msg.type === "video" && msg.video?.id) {
+    // Determine message type and content
+    const isVideo = msg.type === "video" && msg.video?.id;
+    const message = isVideo ? (msg.video.caption || "") : (msg.text?.body ?? "");
+    const mediaId = isVideo ? msg.video.id : undefined;
+    const messageType = isVideo ? "video" : "text";
+
+    if (isVideo) {
       logger.info("🎥 Video message received", { 
         videoId: msg.video.id, 
         mimeType: msg.video.mime_type,
         caption: msg.video.caption 
       });
-
-      (async () => {
-        try {
-          const videoPath = await metaService.downloadVideo(msg.video.id);
-          logger.info(`📁 Video saved to: ${videoPath}`);
-          // TODO: Add video analysis pipeline here
-        } catch (error) {
-          logger.error("Error downloading video", { error });
-          await metaService.sendMessage({ 
-            phoneNumber: from, 
-            message: "Hi There, Apologies from Press0, we couldn't process your video. Please try again later." 
-          });
-        }
-      })();
-
-      return ack;
+    } else {
+      logger.info("💬 Inbound Message Content:", message);
     }
-
-    // Handle text messages
-    const text = msg.text?.body ?? "";
-    logger.info("💬 Inbound Message Content:", text);
 
     (async () => {
       try {
         const mastra = c.get("mastra");
+        
+        const runtimeContext = new RuntimeContext();
+        if (mediaId) {
+          runtimeContext.set("mediaId", mediaId);
+        };
+        runtimeContext.set("messageType", messageType);
+        
         const run = await mastra.getWorkflow(PRESS_0_WORKFLOW_ID).createRunAsync();
         const { result, status } = await run.start({
           inputData: {
-            message: text,
+            message,
             resourceId: from,
           },
+          runtimeContext,
         }) ?? {};
         if (status === STATUS_FAILED) {
           await metaService.sendMessage({ phoneNumber: from, message: "Hi There, Apologies from Press0, something went wrong. We are working on fixing the issue. Please try again later." });

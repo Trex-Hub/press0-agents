@@ -1,10 +1,15 @@
 // ZOD 
 import { z } from "zod";
 
-// Video Analysis Input Schema
+// Download and Analyze Video Input Schema (for WhatsApp videos with mediaId)
+export const DownloadAndAnalyzeVideoInputSchema = z.object({
+  prompt: z.string().describe("The prompt/question to analyze the video with"),
+});
+
+// Video Analysis Input Schema (for external video URLs)
 export const VideoAnalysisInputSchema = z.object({
-  prompt: z.string().describe("Prompt"),
-  videoUrl: z.string().describe("Video URL"),
+  prompt: z.string().describe("The prompt/question to analyze the video with"),
+  videoUrl: z.string().describe("The URL of the video to analyze"),
 });
 
 // Video Analysis Output Schema
@@ -13,7 +18,8 @@ export const VideoAnalysisOutputSchema = z.object({
 });
 
 
-// Video Analysis Types
+// Download and Analyze Video Types
+export type DownloadAndAnalyzeVideoInput = z.infer<typeof DownloadAndAnalyzeVideoInputSchema>;
 export type VideoAnalysisInput = z.infer<typeof VideoAnalysisInputSchema>;
 export type VideoAnalysisOutput = z.infer<typeof VideoAnalysisOutputSchema>;
 

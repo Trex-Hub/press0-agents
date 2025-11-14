@@ -55,6 +55,57 @@ export class MetaService {
     };
   }
 
+  async downloadVideoAsBuffer(mediaId: string): Promise<{ buffer: ArrayBuffer; mimeType: string }> {
+    try {
+      // Step 1: Get the download URL from WhatsApp API
+      const mediaInfoResult = await this.graphApiService.get<{ url: string; mime_type?: string }>(
+        `/${mediaId}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+          },
+        }
+      );
+
+      if (!mediaInfoResult.isSuccess || !mediaInfoResult.data) {
+        throw new Error(`Failed to get media info: ${mediaInfoResult.error?.message || 'Unknown error'}`);
+      }
+
+      const downloadUrl = mediaInfoResult.data.url;
+      if (!downloadUrl) {
+        throw new Error('No download URL found in media info');
+      }
+
+      // Step 2: Download the video file
+      const downloadUrlObj = new URL(downloadUrl);
+      const downloadApiService = new ApiService(`${downloadUrlObj.protocol}//${downloadUrlObj.host}`);
+      
+      const videoResult = await downloadApiService.get<Blob>(
+        downloadUrlObj.pathname + downloadUrlObj.search,
+        {
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+          },
+          responseType: 'blob',
+        }
+      );
+
+      if (!videoResult.isSuccess || !videoResult.data) {
+        throw new Error(`Failed to download video: ${videoResult.error?.message || 'Unknown error'}`);
+      }
+
+      const videoBlob = videoResult.data;
+      const videoBuffer = await videoBlob.arrayBuffer();
+      const mimeType = mediaInfoResult.data.mime_type || 'video/mp4';
+
+      logger.info(`✅ Video downloaded as buffer, size: ${videoBuffer.byteLength} bytes, mimeType: ${mimeType}`);
+      return { buffer: videoBuffer, mimeType };
+    } catch (error) {
+      logger.error(`Error downloading video as buffer: ${error}`);
+      throw error;
+    };
+  }
+
   async downloadVideo(mediaId: string): Promise<string> {
     try {
       // Step 1: Get the download URL from WhatsApp API
