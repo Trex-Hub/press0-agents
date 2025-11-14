@@ -60,11 +60,11 @@ export const handleWebhookPost = async (c: any) => {
       try {
         const mastra = c.get("mastra");
         
-        // Create runtime context and set mediaId if present
         const runtimeContext = new RuntimeContext();
         if (mediaId) {
           runtimeContext.set("mediaId", mediaId);
-        }
+        };
+        runtimeContext.set("messageType", messageType);
         
         const run = await mastra.getWorkflow(PRESS_0_WORKFLOW_ID).createRunAsync();
         const { result, status } = await run.start({
