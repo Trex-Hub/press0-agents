@@ -84,7 +84,7 @@ export const runConvoThread = async ({ resourceId, title }: { resourceId: string
     });
     return updatedThread;
   } catch (error) {
-    logger.error("💭 Error while  running convo thread");
+    logger.error("💭 Error while running convo thread");
     throw error;
   }
 };
