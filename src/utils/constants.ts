@@ -20,6 +20,7 @@ export const META_VERIFY_TOKEN = process.env.META_VERIFY_TOKEN!;
 // IDS
 export const PRESS_0_WORKFLOW_ID = 'press0-workflow';
 export const MESSAGE_STEP_ID = 'message-step';
+export const THREAD_MANAGEMENT_STEP_ID = 'thread-management-step';
 export const PRESS_0_AGENT_ID = 'press0-agent';
 
 // STATUS
