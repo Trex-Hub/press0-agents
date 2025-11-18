@@ -26,3 +26,11 @@ export const PRESS_0_AGENT_ID = 'press0-agent';
 // STATUS
 export const STATUS_SUCCESS = 'success';
 export const STATUS_FAILED = 'failed';
+
+// LANGFUSE
+export const LANGFUSE_BASE_URL = process.env.LANGFUSE_BASE_URL!;
+export const LANGFUSE_PUBLIC_KEY = process.env.LANGFUSE_PUBLIC_KEY!;
+export const LANGFUSE_SECRET_KEY = process.env.LANGFUSE_SECRET_KEY!;
+
+// FLAGS
+export const IS_DEV = process.env.NODE_ENV === 'development';
