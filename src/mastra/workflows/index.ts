@@ -54,6 +54,9 @@ const chatStep = createStep({
     };
 
     const { text = ''} = await agent.generate(message, { 
+      modelSettings:{
+        temperature: 0.2,
+      },
       runtimeContext, 
       threadId,
       resourceId,
