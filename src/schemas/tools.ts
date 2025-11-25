@@ -1,4 +1,5 @@
 // ZOD
+import { FOCUS_MODES } from "@/utils/constants";
 import { z } from "zod";
 
 // Download and Analyze Video Input Schema (for WhatsApp videos with mediaId)
@@ -26,6 +27,42 @@ export const DownloadAndAnalyzeReelInputSchema = z.object({
     .describe("The Instagram reel URL to download and analyze"),
 });
 
+export const SearchInputSchema = z.object({
+  query: z.string().describe("The query to search for").min(1),
+  focusMode: z
+    .enum(FOCUS_MODES)
+    .describe("The focus mode to use for the search")
+    .default("webSearch"),
+  optimizationMode: z
+    .enum(["speed", "balanced"])
+    .optional()
+    .describe("The optimization mode to use for the search")
+    .default("speed"),
+});
+
+export const SearchOutputSchema = z
+  .object({
+    message: z
+      .string()
+      .describe("The search result, generated based on the query"),
+    sources: z
+      .array(
+        z.object({
+          pageContent: z
+            .string()
+            .describe("A snippet of the relevant content from the source."),
+          metadata: z.object({
+            title: z.string().describe("The title of the webpage."),
+            url: z.url().describe("The URL of the webpage."),
+          }),
+        })
+      )
+      .describe("The sources found for the query"),
+  })
+  .describe(
+    "The output of the search, including the search result and the sources found."
+  );
+
 // Download and Analyze Video Types
 export type DownloadAndAnalyzeVideoInput = z.infer<
   typeof DownloadAndAnalyzeVideoInputSchema
@@ -35,3 +72,5 @@ export type VideoAnalysisOutput = z.infer<typeof VideoAnalysisOutputSchema>;
 export type DownloadAndAnalyzeReelInput = z.infer<
   typeof DownloadAndAnalyzeReelInputSchema
 >;
+export type SearchInput = z.infer<typeof SearchInputSchema>;
+export type SearchOutput = z.infer<typeof SearchOutputSchema>;

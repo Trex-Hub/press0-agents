@@ -2,8 +2,14 @@
 import { openai } from "@ai-sdk/openai";
 import { google } from "@ai-sdk/google";
 import { Agent } from "@mastra/core/agent";
+import type { Tool } from "@mastra/core/tools";
 // TOOLS
-import { downloadAndAnalyzeVideo, analyzeVideo, downloadAndAnalyzeReel } from "@/mastra/tools";
+import {
+  downloadAndAnalyzeVideo,
+  analyzeVideo,
+  downloadAndAnalyzeReel,
+  search,
+} from "@/mastra/tools";
 // UTILS
 import memory from "@/mastra/memory";
 // CONSTANTS
@@ -42,27 +48,35 @@ export const press0Agent = new Agent({
     "You are a friendly and helpful Agent for WhatsApp conversations. You can analyze videos that users send automatically.",
   model: google("gemini-2.5-flash"),
   tools: ({ runtimeContext }) => {
+    // Common tools available in all scenarios
+    const commonTools = {
+      search,
+    };
     const messageType = runtimeContext?.get("messageType") as
       | string
       | undefined;
 
     const reelUrl = runtimeContext?.get("reelUrl") as string | undefined;
 
+    // If reelUrl is provided, provide downloadAndAnalyzeReel tool
     if (reelUrl) {
       return {
+        ...commonTools,
         downloadAndAnalyzeReel,
       };
     }
 
-    // If message type is video, only provide downloadAndAnalyzeVideo tool
+    // If message type is video, provide downloadAndAnalyzeVideo tool
     if (messageType === "video") {
       return {
+        ...commonTools,
         downloadAndAnalyzeVideo,
       };
     }
 
-    // For text messages, only provide analyzeVideo tool (for external URLs if needed)
+    // For text messages, provide analyzeVideo tool (for external URLs if needed)
     return {
+      ...commonTools,
       analyzeVideo,
     };
   },

@@ -43,4 +43,21 @@ export const REEL_ANALYSIS_AGENT = "reel-analysis-agent";
 export const INSTAGRAM_REEL_DOWNLOADER_API_URL =
   process.env.INSTAGRAM_REEL_DOWNLOADER_API_URL!;
 
-export const INSTAGRAM_REEL_URL_REGEX =  /https?:\/\/(www\.)?instagram\.com\/reel\/[A-Za-z0-9_-]+/;
+export const INSTAGRAM_REEL_URL_REGEX =
+  /https?:\/\/(www\.)?instagram\.com\/reel\/[A-Za-z0-9_-]+/;
+
+export const WE_SEARCH_API_URL = process.env.WE_SEARCH_API_URL!;
+
+export const ROLES = {
+  HUMAN: "human",
+  ASSISTANT: "assistant",
+};
+
+export const FOCUS_MODES = {
+  WEB_SEARCH: "webSearch",
+  ACADEMIC_SEARCH: "academicSearch",
+  WRITING_ASSISTANT: "writingAssistant",
+  WOLFRAM_ALPHA_SEARCH: "wolframAlphaSearch",
+  YOUTUBE_SEARCH: "youtubeSearch",
+  REDDIT_SEARCH: "redditSearch",
+};
