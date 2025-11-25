@@ -1,8 +1,9 @@
 // CORE
 import { openai } from "@ai-sdk/openai";
+import { google } from "@ai-sdk/google";
 import { Agent } from "@mastra/core/agent";
 // TOOLS
-import { downloadAndAnalyzeVideo, analyzeVideo } from "@/mastra/tools";
+import { downloadAndAnalyzeVideo, analyzeVideo, downloadAndAnalyzeReel } from "@/mastra/tools";
 // UTILS
 import memory from "@/mastra/memory";
 // CONSTANTS
@@ -11,6 +12,7 @@ import { PRESS_0_AGENT_ID } from "@/utils/constants";
 import {
   defaultPressOAgentPrompt,
   videoAnalysisAgentPrompt,
+  reelAnalysisAgentPrompt,
 } from "@/mastra/prompts";
 
 export const press0Agent = new Agent({
@@ -22,9 +24,15 @@ export const press0Agent = new Agent({
       | undefined;
     const mediaId = runtimeContext?.get("mediaId") as string | undefined;
 
+    const reelUrl = runtimeContext?.get("reelUrl") as string | undefined;
+
     // Dynamic instructions based on message type
     if (messageType === "video" && mediaId) {
       return videoAnalysisAgentPrompt.compile();
+    }
+
+    if (reelUrl) {
+      return reelAnalysisAgentPrompt.compile();
     }
 
     // Default instructions for text messages
@@ -32,11 +40,19 @@ export const press0Agent = new Agent({
   },
   description:
     "You are a friendly and helpful Agent for WhatsApp conversations. You can analyze videos that users send automatically.",
-  model: openai("gpt-4o-mini"),
+  model: google("gemini-2.5-flash"),
   tools: ({ runtimeContext }) => {
     const messageType = runtimeContext?.get("messageType") as
       | string
       | undefined;
+
+    const reelUrl = runtimeContext?.get("reelUrl") as string | undefined;
+
+    if (reelUrl) {
+      return {
+        downloadAndAnalyzeReel,
+      };
+    }
 
     // If message type is video, only provide downloadAndAnalyzeVideo tool
     if (messageType === "video") {

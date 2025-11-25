@@ -38,6 +38,9 @@ export const IS_DEV = process.env.NODE_ENV === "development";
 // PROMPT ID's
 export const DEFAULT_PRESS0_AGENT = "default-press0-agent";
 export const VIDEO_ANALYSIS_AGENT = "video-analysis-agent";
+export const REEL_ANALYSIS_AGENT = "reel-analysis-agent";
 
 export const INSTAGRAM_REEL_DOWNLOADER_API_URL =
   process.env.INSTAGRAM_REEL_DOWNLOADER_API_URL!;
+
+export const INSTAGRAM_REEL_URL_REGEX =  /https?:\/\/(www\.)?instagram\.com\/reel\/[A-Za-z0-9_-]+/;
