@@ -62,5 +62,8 @@ export const mastra = new Mastra({
         })],
       }
     }  
-  }
+  },
+  bundler: {
+    externals: ["@google/genai"],
+  },
 });

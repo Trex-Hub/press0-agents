@@ -9,7 +9,8 @@
     "build": "mastra build",
     "start": "mastra start",
     "db": "prisma",
-    "ngrok": "ngrok http 4111"
+    "ngrok": "ngrok http 4111",
+    "meta-token": "openssl rand -hex 16"
   },
   "keywords": [],
   "author": [
@@ -45,10 +46,6 @@
     "@mastra/loggers": "^0.10.19",
     "@mastra/memory": "^0.15.11",
     "@mastra/pg": "^0.17.8",
-    "@opentelemetry/auto-instrumentations-node": "^0.66.0",
-    "@opentelemetry/core": "^2.2.0",
-    "@opentelemetry/exporter-trace-otlp-grpc": "^0.207.0",
-    "@opentelemetry/instrumentation": "^0.207.0",
     "@opentelemetry/sdk-node": "^0.208.0",
     "@prisma/client": "6.19.0",
     "dotenv": "^17.2.3",
