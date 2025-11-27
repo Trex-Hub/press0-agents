@@ -41,10 +41,6 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=8080
 
-# Create a non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S mastra -u 1001
-
 # Copy only necessary files from builder
 # 1. Package files
 COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
@@ -58,12 +54,6 @@ COPY --from=builder /app/prisma ./prisma
 
 # 4. Built application artifacts
 COPY --from=builder /app/.mastra ./.mastra
-
-# Set ownership to non-root user
-RUN chown -R mastra:nodejs /app
-
-# Switch to non-root user
-USER mastra
 
 # Expose the application port
 EXPOSE 8080
