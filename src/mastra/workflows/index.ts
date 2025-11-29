@@ -35,7 +35,6 @@ const threadManagementStep = createStep({
       logger.debug(` Using thread:", ${threadId}`);
       return { threadId };
     } catch (error) {
-      logger.error("Error in thread management:");
       throw error;
     }
   },
@@ -50,15 +49,24 @@ const chatStep = createStep({
     const { message, threadId, resourceId } = inputData ?? {};
     const agent = mastra?.getAgent(PRESS_0_AGENT_ID);
     if (!agent) {
-      throw new Error("Agent not found");
+       return { text: 'Press0 Agent seems to be offline. Please try again later.' };
     };
 
+
+    try {
     const { text = ''} = await agent.generate(message, { 
+      modelSettings:{
+        temperature: 0.2,
+      },
       runtimeContext, 
       threadId,
       resourceId,
     }) ?? {};
     return { text };
+    } catch (error) {
+      logger.error("Error in chat workflow:", { error });
+      return { text: 'Press0 Agent seems to be having some technical issues. Please try again later.' };
+    }
   },
 });
 

@@ -68,7 +68,7 @@ configuration
 - **Build Tool**: tsup
 - **Package Manager**: pnpm
 - **Logging**: Pino Logger
-- **AI Integration**: OpenAI SDK
+- **AI Integration**: Google SDK
 
 ## 📝 Available Scripts
 
