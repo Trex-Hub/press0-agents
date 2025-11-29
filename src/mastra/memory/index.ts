@@ -16,7 +16,7 @@ const agentMemory = (() => {
     memory = new Memory({
       storage: storage as any, 
       vector: vector as any,
-      embedder: google.embedding(GOOGLE_EMBEDDING_MODEL),
+      embedder: google.textEmbedding(GOOGLE_EMBEDDING_MODEL),
       options: {
         lastMessages: 10,
         semanticRecall: {
