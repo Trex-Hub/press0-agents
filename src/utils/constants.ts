@@ -7,6 +7,7 @@ export const LOGGER_LEVEL = process.env.LOGGER_LEVEL || "debug";
 // GOOGLE
 export const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY!;
 export const GOOGLE_MODEL = process.env.GOOGLE_MODEL || "gemini-2.0-flash";
+export const GOOGLE_EMBEDDING_MODEL = process.env.GOOGLE_EMBEDDING_MODEL ?? "text-embedding-004";
 
 // DATABASE
 export const DATABASE_URL = process.env.DATABASE_URL!;

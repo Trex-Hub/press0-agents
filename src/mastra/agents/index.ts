@@ -1,8 +1,6 @@
 // CORE
-import { openai } from "@ai-sdk/openai";
 import { google } from "@ai-sdk/google";
 import { Agent } from "@mastra/core/agent";
-import type { Tool } from "@mastra/core/tools";
 // TOOLS
 import {
   downloadAndAnalyzeVideo,
@@ -20,10 +18,13 @@ import {
   videoAnalysisAgentPrompt,
   reelAnalysisAgentPrompt,
 } from "@/mastra/prompts";
+// UTILS
+import { whatsappFormatter } from "@/utils/formatter";
 
 export const press0Agent = new Agent({
   name: PRESS_0_AGENT_ID,
   id: PRESS_0_AGENT_ID,
+  outputProcessors: [whatsappFormatter],
   instructions: ({ runtimeContext }) => {
     const messageType = runtimeContext?.get("messageType") as
       | string
